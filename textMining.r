@@ -12,11 +12,13 @@ getEmotionalType <- function(x,pwords,nwords){
     yLen <-length(x[[index]])  
     index2 <- 1  
     while(index2<= yLen){  
-      if(length(pwords[pwords==x[[index]][index2]]) >= 1){  
-        emotionType[index] <- emotionType[index] + 1  
-      }else if(length(nwords[nwords==x[[index]][index2]]) >= 1){  
-        emotionType[index] <- emotionType[index] - 1  
-      }  
+      if(x[[index]][[index2]] != "") {
+        if(length(pwords[pwords==x[[index]][index2]]) >= 1){  
+          emotionType[index] <- emotionType[index] + 1  
+        }else if(length(nwords[nwords==x[[index]][index2]]) >= 1){  
+          emotionType[index] <- emotionType[index] - 1  
+        }
+      }
       index2<- index2 + 1  
     }  
     #获取进度  
@@ -29,15 +31,9 @@ getEmotionalType <- function(x,pwords,nwords){
 }
 
 cutter = worker()
-
-input <- readLines("360/360巴拉拉小魔仙.txt", encoding = "UTF-8")
-
+input <- readLines("360/360速度与激情.txt", encoding = "UTF-8")
 positive <- readLines("ntusd-positive.txt")
-
 negative <- readLines("ntusd-negative.txt")
-
-segWords<-segment(input,cutter)
-
 
 f<-readLines('chinese_stopword.txt')
 stopwords<-c(NULL)
@@ -46,20 +42,22 @@ for(i in 1:length(f))
   stopwords[i]<-f[i]
 }
 
-segWords<-filter_segment(segWords,stopwords)
+commentSize <- length(input);
 
-segWords<-gsub("[0-9a-zA-Z]+?","",segWords)
+emotionRank <- numeric(0)
+emotionRank[1:commentSize] <- 0
 
-segWords<-str_trim(segWords)
-segWords
+commentIndex <- 1
 
-EmotionRank <- getEmotionalType(segWords,positive,negative)
-EmotionRank
-# 
-# commentEmotionalRank <-list(rank=EmotionRank,comment=input)
-# 
-# commentEmotionalRank <-as.data.frame(commentEmotionalRank)
-# 
-# fix(commentEmotionalRank)
-# 
-# commentEmotionalRank
+while(commentIndex <= commentSize) {
+  singleComment <- input[commentIndex]
+  segWords<-segment(singleComment,cutter)
+  segWords<-filter_segment(segWords,stopwords)
+  segWords<-gsub("[0-9a-zA-Z]+?","",segWords)
+  segWords<-str_trim(segWords)
+  emotionalType <- getEmotionalType(segWords,positive,negative)
+  emotionRank[commentIndex] <- sum(emotionalType)
+  commentIndex <- commentIndex + 1
+}
+
+count(emotionRank)
