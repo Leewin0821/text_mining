@@ -65,13 +65,21 @@ getEmotionalScoreForOneGame <- function(folderName,fileName) {
     commentIndex <- commentIndex + 1
   }
   output <- count(emotionRank)
+  values <- output[1]
+  freq <- output[2]
+  average <- sum(values * freq)/sum(freq)
+  average <- paste0(format(average*100, digits=2), "%")
+  print(average)
   lastIndex <- nchar(fileName);
   outputName <- substring(fileName, 1, lastIndex-4)
   outputName <- paste(outputName, ".csv", sep = "")
   outputName <- paste("output", folderName, outputName, sep = "/")
-  write.csv(output, file = outputName)
+  write.csv(average, file = outputName)
 }
 
-folderName <- "360"
-fileName <- "360巴拉拉小魔仙.txt"
-getEmotionalScoreForOneGame(folderName,fileName)
+
+gamePlatform <- "temp"
+fileNames <- list.files(gamePlatform);
+for(fileName in fileNames) {
+  getEmotionalScoreForOneGame(gamePlatform,fileName) 
+}
