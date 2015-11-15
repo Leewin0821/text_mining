@@ -1,3 +1,4 @@
+setwd("~/workspace")
 library(jiebaR)
 library(stringr)
 library(plyr)
@@ -30,34 +31,41 @@ getEmotionalType <- function(x,pwords,nwords){
   emotionType  
 }
 
-cutter = worker()
-input <- readLines("360/360速度与激情.txt", encoding = "UTF-8")
-positive <- readLines("ntusd-positive.txt")
-negative <- readLines("ntusd-negative.txt")
-
-f<-readLines('chinese_stopword.txt')
-stopwords<-c(NULL)
-for(i in 1:length(f))
-{
-  stopwords[i]<-f[i]
+getEmotionalScoreForOneGame <- function(fileName) {
+  cutter = worker()
+  input <- readLines(fileName, encoding = "UTF-8")
+  positive <- readLines("ntusd-positive.txt")
+  negative <- readLines("ntusd-negative.txt")
+  
+  f<-readLines('chinese_stopword.txt')
+  stopwords<-c(NULL)
+  for(i in 1:length(f))
+  {
+    stopwords[i]<-f[i]
+  }
+  
+  commentSize <- length(input);
+  
+  emotionRank <- numeric(0)
+  emotionRank[1:commentSize] <- 0
+  
+  commentIndex <- 1
+  
+  while(commentIndex <= commentSize) {
+    singleComment <- input[commentIndex]
+    segWords<-segment(singleComment,cutter)
+    segWords<-filter_segment(segWords,stopwords)
+    segWords<-gsub("[0-9a-zA-Z]+?","",segWords)
+    segWords<-str_trim(segWords)
+    # print(segWords)
+    emotionalType <- getEmotionalType(segWords,positive,negative)
+    # print(emotionalType)
+    emotionRank[commentIndex] <- sum(emotionalType)
+    commentIndex <- commentIndex + 1
+  }
+  count(emotionRank) 
 }
 
-commentSize <- length(input);
 
-emotionRank <- numeric(0)
-emotionRank[1:commentSize] <- 0
-
-commentIndex <- 1
-
-while(commentIndex <= commentSize) {
-  singleComment <- input[commentIndex]
-  segWords<-segment(singleComment,cutter)
-  segWords<-filter_segment(segWords,stopwords)
-  segWords<-gsub("[0-9a-zA-Z]+?","",segWords)
-  segWords<-str_trim(segWords)
-  emotionalType <- getEmotionalType(segWords,positive,negative)
-  emotionRank[commentIndex] <- sum(emotionalType)
-  commentIndex <- commentIndex + 1
-}
-
-count(emotionRank)
+fileName <- "360/360巴拉拉小魔仙.txt"
+getEmotionalScoreForOneGame(fileName)
