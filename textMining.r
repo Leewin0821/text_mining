@@ -31,9 +31,10 @@ getEmotionalType <- function(x,pwords,nwords){
   emotionType  
 }
 
-getEmotionalScoreForOneGame <- function(fileName) {
+getEmotionalScoreForOneGame <- function(folderName,fileName) {
   cutter = worker()
-  input <- readLines(fileName, encoding = "UTF-8")
+  inputFileName <- paste(folderName, fileName, sep = "/")
+  input <- readLines(inputFileName, encoding = "UTF-8")
   positive <- readLines("ntusd-positive.txt")
   negative <- readLines("ntusd-negative.txt")
   
@@ -63,9 +64,14 @@ getEmotionalScoreForOneGame <- function(fileName) {
     emotionRank[commentIndex] <- sum(emotionalType)
     commentIndex <- commentIndex + 1
   }
-  count(emotionRank) 
+  output <- count(emotionRank)
+  lastIndex <- nchar(fileName);
+  outputName <- substring(fileName, 1, lastIndex-4)
+  outputName <- paste(outputName, ".csv", sep = "")
+  outputName <- paste("output", folderName, outputName, sep = "/")
+  write.csv(output, file = outputName)
 }
 
-
-fileName <- "360/360巴拉拉小魔仙.txt"
-getEmotionalScoreForOneGame(fileName)
+folderName <- "360"
+fileName <- "360巴拉拉小魔仙.txt"
+getEmotionalScoreForOneGame(folderName,fileName)
