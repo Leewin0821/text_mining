@@ -58,23 +58,23 @@ getEmotionalScoreForOneGame <- function(folderName,fileName) {
     segWords<-filter_segment(segWords,stopwords)
     segWords<-gsub("[0-9a-zA-Z]+?","",segWords)
     segWords<-str_trim(segWords)
-    # print(segWords)
     emotionalType <- getEmotionalType(segWords,positive,negative)
-    # print(emotionalType)
     emotionRank[commentIndex] <- sum(emotionalType)
     commentIndex <- commentIndex + 1
   }
   output <- count(emotionRank)
-  values <- output[1]
-  freq <- output[2]
-  average <- sum(values * freq)/sum(freq)
-  average <- paste0(format(average*100, digits=2), "%")
-  print(average)
+  positiveTable <- subset(output, output$x>0)
+  positivePoint <- sum(positiveTable$x*positiveTable$freq)
+  negativeTable <- subset(output, output$x<0)
+  negativePoint <- abs(sum(negativeTable$x*negativeTable$freq))
+  positivePercentage <- positivePoint/(positivePoint + negativePoint)
+  positivePercentage <- paste0(format(positivePercentage*100, digits=4), "%")
+  outputFormat <- as.data.frame(positivePercentage, folderName)
   lastIndex <- nchar(fileName);
   outputName <- substring(fileName, 1, lastIndex-4)
   outputName <- paste(outputName, ".csv", sep = "")
   outputName <- paste("output", folderName, outputName, sep = "/")
-  write.csv(average, file = outputName)
+  write.csv(outputFormat, file = outputName)
 }
 
 
