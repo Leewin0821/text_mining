@@ -2,7 +2,6 @@ setwd("~/workspace")
 library(jiebaR)
 library(stringr)
 library(plyr)
-library(wordcloud)
 
 getEmotionalType <- function(x,pwords,nwords){  
   emotionType <-numeric(0)  
@@ -37,7 +36,6 @@ getEmotionalScoreForOneGame <- function(folderName,fileName) {
   input <- readLines(inputFileName, encoding = "UTF-8")
   positive <- readLines("ntusd-positive.txt")
   negative <- readLines("ntusd-negative.txt")
-  
   f<-readLines('chinese_stopword.txt')
   stopwords<-c(NULL)
   for(i in 1:length(f))
@@ -69,9 +67,9 @@ getEmotionalScoreForOneGame <- function(folderName,fileName) {
   negativePoint <- abs(sum(negativeTable$x*negativeTable$freq))
   positivePercentage <- positivePoint/(positivePoint + negativePoint)
   positivePercentage <- paste0(format(positivePercentage*100, digits=4), "%")
-  outputFormat <- as.data.frame(positivePercentage, folderName)
   lastIndex <- nchar(fileName);
   outputName <- substring(fileName, 1, lastIndex-4)
+  outputFormat <- as.data.frame(positivePercentage, outputName)
   outputName <- paste(outputName, ".csv", sep = "")
   outputName <- paste("output", folderName, outputName, sep = "/")
   write.csv(outputFormat, file = outputName)
