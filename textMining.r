@@ -56,8 +56,10 @@ getEmotionalScoreForOneGame <- function(folderName,fileName) {
     segWords<-filter_segment(segWords,stopwords)
     segWords<-gsub("[0-9a-zA-Z]+?","",segWords)
     segWords<-str_trim(segWords)
+    print(segWords)
     emotionalType <- getEmotionalType(segWords,positive,negative)
     emotionRank[commentIndex] <- sum(emotionalType)
+    print(emotionalType)
     commentIndex <- commentIndex + 1
   }
   output <- count(emotionRank)
